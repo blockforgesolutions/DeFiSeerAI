@@ -1,0 +1,26 @@
+{
+  "canisters": {
+    "icpai_backend": {
+      "main": "src/icpai_backend/main.mo",
+      "type": "motoko"
+    },
+    "icpai_frontend": {
+      "dependencies": [
+        "icpai_backend"
+      ],
+      "source": [
+        "src/icpai_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "icpai_frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
