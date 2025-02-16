@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { icpai_backend } from 'declarations/icpai_backend';
 import Home from './pages/home';
+import { AuthProvider, useAuth } from "./auth/AuthProvider";
+import LoginButton from "./components/LoginButton";
+import LogoutButton from "./components/LogoutButton";
 
 function App() {
   const [greeting, setGreeting] = useState('');
@@ -15,10 +18,15 @@ function App() {
   }
 
   return (
+    <AuthProvider> 
+      <LoginButton />
     <main>
       <img src="/logo2.svg" alt="DFINITY logo" />
+      <LogoutButton />
       <Home />
+    
     </main>
+    </AuthProvider>
   );
 }
 
