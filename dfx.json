@@ -9,10 +9,21 @@
         "icpai_backend"
       ],
       "source": [
-        "src/icpai_frontend/dist"
+          "src/icpai_frontend/dist"
       ],
       "type": "assets",
       "workspace": "icpai_frontend"
+    },
+    "internet_identity": {
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "frontend": {},
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
+        }
+      },
+      "type": "custom",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
     }
   },
   "defaults": {
