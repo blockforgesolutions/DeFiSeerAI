@@ -1,10 +1,9 @@
-import { fileURLToPath, URL } from 'url';
-import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
-import environment from 'vite-plugin-environment';
-import dotenv from 'dotenv';
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import environment from "vite-plugin-environment";
+import * as dotenv from "dotenv";
 
-dotenv.config({ path: '../../.env' });
+dotenv.config({ path: "../../.env" });
 
 export default defineConfig({
   build: {
@@ -34,9 +33,11 @@ export default defineConfig({
     alias: [
       {
         find: "declarations",
-        replacement: fileURLToPath(
-          new URL("../declarations", import.meta.url)
-        ),
+        replacement: new URL("../declarations", "file:///").pathname,
+      },
+      {
+        find: "@", // Add this alias for the src directory
+        replacement: new URL("./src", "file:///").pathname,
       },
     ],
   },

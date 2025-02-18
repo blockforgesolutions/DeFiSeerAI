@@ -1,11 +1,18 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { AuthClient } from "@dfinity/auth-client";
 
-const AuthContext = createContext();
+interface AuthContextProps {
+  isAuthenticated: boolean;
+  identity: any;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
+}
 
-export const AuthProvider = ({ children }) => {
-  const [authClient, setAuthClient] = useState(null);
-  const [identity, setIdentity] = useState(null);
+const AuthContext = createContext<AuthContextProps | null>(null);
+
+export const AuthProvider = ({ children }: { children: ReactNode })=> {
+  const [authClient, setAuthClient] = useState<AuthClient | null>(null);
+  const [identity, setIdentity] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
