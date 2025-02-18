@@ -70,7 +70,7 @@ const Dashboard = () => {
                         {loading ? <Loader2 className="animate-spin" /> : "Get Signal"}
                     </Button>
                     {signalDetails && (
-                        <div className="text-lg">
+                        <div className="text-[18px] text-white">
                             <p><strong>Current Price:</strong> {signalDetails.price}</p>
                             <p>
                                 <strong>Signal:</strong>

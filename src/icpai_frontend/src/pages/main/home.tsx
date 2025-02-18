@@ -4,6 +4,7 @@ import { TrendingUp, Activity, Rocket } from "lucide-react";
 import { TypographyH3 } from "@/components/ui/typography-h3";
 import { TypographyP } from "@/components/ui/typography-p";
 import { Button } from "@/components/ui/button";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 const tools = [
     {
@@ -32,9 +33,24 @@ const tools = [
     }
 ];
 
+const faqs = [
+    {
+        question: "How does DeFiSeer AI work?",
+        answer: "DeFiSeer AI uses advanced machine learning algorithms to analyze market data and generate buy/sell signals. The automated trading bot executes trades based on your strategy."
+    },
+    {
+        question: "How can the AI Signal Tool help me?",
+        answer: "The AI Signal Tool provides real-time trading signals based on market trends and price movements, helping you make data-driven trading decisions with confidence."
+    },
+    {
+        question: "Is the Automated Trading Bot safe to use?",
+        answer: "Yes, the bot incorporates advanced risk management strategies and allows users to customize risk levels to align with their trading preferences."
+    }
+];
+
 export default function Home() {
     return (
-        <div className="bg-black text-white min-h-screen flex flex-col items-center p-10">
+        <div className=" text-white min-h-screen flex flex-col items-center p-10">
             <div className="text-5xl font-bold flex items-center gap-4">
                 <Rocket color="orange" size={40} />
                 <TypographyH3 title="DeFiSeer AI" className="text-4xl" />
@@ -74,6 +90,18 @@ export default function Home() {
                     </TabsContent>
                 ))}
             </Tabs>
+
+            <div className="lg:mt-16 w-full max-w-4xl">
+                <TypographyH3 title="Frequently Asked Questions" className="text-center text-3xl" />
+                <Accordion type="single" collapsible className="mt-6 w-full">
+                    {faqs.map((faq, index) => (
+                        <AccordionItem key={index} value={`faq-${index}`} className="border-b border-gray-700 rounded-lg p-4">
+                            <AccordionTrigger className="text-gray-200 text-lg">{faq.question}</AccordionTrigger>
+                            <AccordionContent className="text-gray-400">{faq.answer}</AccordionContent>
+                        </AccordionItem>
+                    ))}
+                </Accordion>
+            </div>
         </div>
     );
 }
