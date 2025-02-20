@@ -7,7 +7,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Bell, LogOut, User } from "lucide-react";
-import { useAuthClient } from "@/hooks/useAuthClient";
+import { useAuthClient } from "@/context/useAuthClient";
 
 export function DashboardNavbar() {
     const { logout } = useAuthClient();

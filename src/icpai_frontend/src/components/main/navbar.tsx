@@ -1,4 +1,4 @@
-import { useAuthClient } from "@/hooks/useAuthClient";
+import { useAuthClient } from "@/context/useAuthClient";
 import LoginLogoutButton from "../LoginLogoutButton";
 import { TypographyH3 } from "../ui/typography-h3";
 import { icpai_user } from '../../../../declarations/icpai_user'

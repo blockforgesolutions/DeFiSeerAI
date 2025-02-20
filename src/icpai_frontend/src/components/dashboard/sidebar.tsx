@@ -1,7 +1,7 @@
 import { Bot, House, TrendingUpDown } from 'lucide-react'
 import React from 'react'
 import { Button } from '../ui/button'
-import { useAuthClient } from '@/hooks/useAuthClient'
+import { useAuthClient } from '@/context/useAuthClient'
 import { Link } from 'react-router-dom'
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
