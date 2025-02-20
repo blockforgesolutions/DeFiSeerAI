@@ -4,9 +4,14 @@
       "main": "src/icpai_backend/main.mo",
       "type": "motoko"
     },
+    "icpai_user":{
+      "main":"src/icpai_backend/user.mo",
+      "type":"motoko"
+    },
     "icpai_frontend": {
       "dependencies": [
-        "icpai_backend"
+        "icpai_backend",
+        "icpai_user"
       ],
       "source": [
           "src/icpai_frontend/dist"
