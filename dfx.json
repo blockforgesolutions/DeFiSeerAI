@@ -6,7 +6,8 @@
     },
     "icpai_user":{
       "main":"src/icpai_backend/user.mo",
-      "type":"motoko"
+      "type":"motoko",
+      "specified_id": "bw4dl-smaaa-aaaaa-qaacq-cai"
     },
     "icpai_frontend": {
       "dependencies": [
