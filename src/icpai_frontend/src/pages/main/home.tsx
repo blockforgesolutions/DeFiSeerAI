@@ -50,22 +50,24 @@ const faqs = [
 
 export default function Home() {
     return (
-        <div className=" text-white min-h-screen flex flex-col items-center p-10">
-            <div className="text-5xl font-bold flex items-center gap-4">
-                <Rocket color="orange" size={40} />
-                <TypographyH3 title="DeFiSeer AI" className="text-4xl" />
-                <Rocket color="orange" size={40} />
+        <div className="w-full text-white min-h-screen flex flex-col justify-center items-center p-10">
+            <div className="w-full flex flex-col justify-center items-center">
+                <div className="text-5xl font-bold flex items-center gap-4">
+                    <Rocket color="orange" size={40} />
+                    <TypographyH3 title="DeFiSeer AI" className="text-4xl" />
+                    <Rocket color="orange" size={40} />
+                </div>
+                <TypographyP className="mt-4 text-lg text-gray-400 text-center max-w-3xl" paragraph="AI-powered cryptocurrency price prediction and automated trading bot integration. Get ahead in the market with our intelligent analytics and automation tools." />
+                <Button className="mt-6 bg-orange-500 hover:bg-orange-600 px-6 py-3 text-lg rounded-lg">
+                    Start Automating Your Trades
+                </Button>
+                <TypographyP className="mt-2 text-sm text-gray-500" paragraph="Loved by thousands of crypto traders worldwide!" />
             </div>
-            <TypographyP className="mt-4 text-lg text-gray-400 text-center max-w-3xl" paragraph="AI-powered cryptocurrency price prediction and automated trading bot integration. Get ahead in the market with our intelligent analytics and automation tools." />
-            <Button className="mt-6 bg-orange-500 hover:bg-orange-600 px-6 py-3 text-lg rounded-lg">
-                Start Automating Your Trades
-            </Button>
-            <TypographyP className="mt-2 text-sm text-gray-500" paragraph="Loved by thousands of crypto traders worldwide!" />
 
-            <Tabs defaultValue="signals" className="w-full max-w-4xl mt-12">
+            <Tabs defaultValue="signals" className="w-full max-w-4xl mt-24">
                 <TabsList className="flex justify-center gap-6 bg-transparent">
                     {tools.map((tool) => (
-                        <TabsTrigger key={tool.value} value={tool.value} className="flex items-center gap-2 w-full text-lg">
+                        <TabsTrigger key={tool.value} value={tool.value} className="flex items-center gap-2 w-full lg:text-lg">
                             {tool.icon} {tool.title}
                         </TabsTrigger>
                     ))}
@@ -91,7 +93,7 @@ export default function Home() {
                 ))}
             </Tabs>
 
-            <div className="lg:mt-16 w-full max-w-4xl">
+            <div className="mt-24 w-full max-w-4xl">
                 <TypographyH3 title="Frequently Asked Questions" className="text-center text-3xl" />
                 <Accordion type="single" collapsible className="mt-6 w-full">
                     {faqs.map((faq, index) => (

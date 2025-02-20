@@ -6,9 +6,9 @@ export function Footer() {
     return (
         <div className="w-full flex flex-col p-4">
             <Separator className="my-4 bg-gray-800" />
-            <div className="w-full flex justify-between lg:px-8 items-center">
+            <div className="w-full lg:flex block justify-center lg:justify-between lg:px-8 items-center">
                 <TypographyP className="text-sm text-gray-400" paragraph="© 2025 DeFiSeer AI. All Rights Reserved" />
-                <div className="flex gap-4">
+                <div className="flex gap-4 mt-4 lg:mt-0">
                     <Link to={'/privacy'}>
                         <TypographyP className="text-sm text-gray-400 underline underline-offset-4" paragraph="Privacy Policy" />
                     </Link>
