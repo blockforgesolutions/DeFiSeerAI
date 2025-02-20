@@ -1,7 +1,7 @@
 // src/routes.js
 import Dashboard from './pages/dashboard/dashboard';
 import Home from './pages/main/home';
-// import Dashboard from './pages/Dashboard';
+import SignUp from './pages/main/sign-up';
 
 export const routes = [
   {
@@ -12,6 +12,11 @@ export const routes = [
         element: <Home />,
         path: '/',
       },
+      {
+        name: "Sign Up",
+        element: <SignUp />,
+        path:"/sign-up"
+      }
     ],
   },
   {
