@@ -32,7 +32,6 @@ export const AuthProvider = ({ children }: { children: ReactNode })=> {
 
     initAuth();
   }, []);
-  console.log(principal);
   const login = async () => {
     if (!authClient) return;
     await authClient.login({

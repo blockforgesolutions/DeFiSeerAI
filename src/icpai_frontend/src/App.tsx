@@ -3,18 +3,9 @@ import { routes } from './routes';
 import MainLayout from './layouts/main';
 import DashboardLayout from './layouts/dashboard';
 import { AuthProvider } from './hooks/AuthProvider';
-import { useEffect } from 'react';
-import { icpai_backend } from '../../declarations/icpai_backend';
 
 function App() {
 
-  useEffect(() => {
-    const fetchAndTrain = async() => {
-      await icpai_backend.fetchAndTrain();
-    };
-
-    fetchAndTrain();
-  },[])
 
   return (
     <AuthProvider>

@@ -50,7 +50,6 @@ export function DashboardNavbar() {
                     <PopoverTrigger asChild>
                         <Avatar className="w-10 h-10 cursor-pointer flex justify-center items-center ">
                             <Bell color="white" size={24}/>
-                            <AvatarFallback>U</AvatarFallback>
                         </Avatar>
                     </PopoverTrigger>
                 </Popover>
@@ -58,7 +57,6 @@ export function DashboardNavbar() {
                     <PopoverTrigger asChild>
                         <Avatar className="w-10 h-10 cursor-pointer border-2 border-gray-300">
                             <AvatarImage src={user?.avatar || "https://via.placeholder.com/100"} alt="Avatar" />
-                            <AvatarFallback>U</AvatarFallback>
                         </Avatar>
                     </PopoverTrigger>
                     <PopoverContent align="end" className="w-48 p-2 bg-gray-800 shadow-lg rounded-lg">
