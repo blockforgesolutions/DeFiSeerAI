@@ -5,22 +5,33 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { icpai_user } from "../../../../declarations/icpai_user";
 import { Principal } from "@dfinity/principal";
+import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
 
 export default function SignUp() {
     const [name, setName] = useState("");
     const [avatar, setAvatar] = useState("");
     const principalId = localStorage.getItem("principal");
+    const navigate = useNavigate();
+    const [isError, setIsError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const handleSignUp = async() => {
+    const handleSignUp = async () => {
         if (!principalId) {
             return
         }
 
         const avatarValue: [] | [string] = avatar ? [avatar] : [];
         const principal = Principal.fromText(principalId);
-        const response = await icpai_user.signUpWithInternetIdentity(name, avatarValue, principal);
-        console.log(response);
-        
+        const response: boolean = await icpai_user.signUpWithInternetIdentity(name, avatarValue, principal);
+        if (response) {
+            navigate("/dashboard");
+        } else {
+            setIsError(true);
+            setErrorMessage("Sign up failed! Try again.");
+        }
+
     }
 
     return (
@@ -48,6 +59,16 @@ export default function SignUp() {
                     <Button onClick={handleSignUp} className="w-full">Sign Up</Button>
                 </CardContent>
             </Card>
+
+            {isError && (
+                <Alert>
+                    <Terminal className="h-4 w-4" />
+                    <AlertTitle>Heads up!</AlertTitle>
+                    <AlertDescription>
+                        {errorMessage}
+                    </AlertDescription>
+                </Alert>
+            )}
         </div>
     );
 }
