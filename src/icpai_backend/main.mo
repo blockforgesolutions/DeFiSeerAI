@@ -14,29 +14,10 @@ import Cycles "mo:base/ExperimentalCycles";
 import Char "mo:base/Char";
 import Nat32 "mo:base/Nat32";
 import Timer "mo:base/Timer";
-import Principal "mo:base/Principal";
 import Types "types";
 
 actor TradingBot {
-    // HTTP istekleri için tip tanımlamaları
-    type HttpRequest = {
-        url : Text;
-        method : Text;
-        body : ?[Nat8];
-        headers : [(Text, Text)];
-        max_response_bytes : ?Nat64;
-    };
 
-    type HttpResponse = {
-        body : [Nat8];
-        headers : [(Text, Text)];
-        status_code : Nat16;
-    };
-
-    // IC Management Canister tipi
-    type IC = actor {
-        http_request : HttpRequestArgs -> async HttpResponsePayload;
-    };
 
     type HttpRequestArgs = {
         url : Text;
