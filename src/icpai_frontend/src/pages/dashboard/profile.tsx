@@ -7,22 +7,25 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Principal } from '@dfinity/principal';
 import { useNavigate } from "react-router-dom";
+import { useLoading } from "@/context/loading-context";
 
 export function Profile() {
     const { principal, logout } = useAuthClient();
     const [user, setUser] = useState<UserType | null>(null);
-    const [tempUser, setTempUser] = useState<UserType | null>(null); // Temporary state for holding changes
+    const [tempUser, setTempUser] = useState<UserType | null>(null);
     const [openDialog, setOpenDialog] = useState(false);
     const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+    const { isLoading, setLoading } = useLoading();
     const navigate = useNavigate();
 
     const getCurrentUser = async () => {
         if (!principal) return;
+        setLoading(true);
         const response = await icpai_user.getUserInfo(principal);
-
+        setLoading(false);
         if (!response || !response[0]) return;
         setUser(response[0]);
-        setTempUser(response[0]); // Initialize tempUser with the current user data
+        setTempUser(response[0]);
     };
 
     useEffect(() => {
@@ -42,7 +45,7 @@ export function Profile() {
     };
 
     const handleUpdateProfile = async () => {
-        if(!principal || !tempUser) return;
+        if (!principal || !tempUser) return;
 
         const userData = {
             ...tempUser,
@@ -50,21 +53,18 @@ export function Profile() {
         };
 
         const response = await icpai_user.updateUser(userData, Principal.fromText(principal));
-        console.log(response);
-        setOpenUpdateDialog(false);
         if (response) {
-            setUser(tempUser); // Apply changes to the original user state
-            getCurrentUser(); // Re-fetch user data to ensure the update is successful
+            setUser(tempUser);
+            getCurrentUser();
         } else {
             console.log("Failed to update profile");
         }
+        setOpenUpdateDialog(false);
     };
 
     const handleDeleteAccount = async () => {
-        if(!principal || !user) return;
-
+        if (!principal || !user) return;
         const response = await icpai_user.deleteUser(Principal.fromText(principal));
-        console.log(response);
         if (response) {
             await logout();
             navigate('/');
@@ -73,28 +73,33 @@ export function Profile() {
 
     return (
         <div className="w-full h-screen flex flex-col items-center p-4 space-y-6">
-            <div className="flex items-center gap-6">
-                <Avatar className="w-48 h-48 cursor-pointer border-2 border-gray-300">
-                    <AvatarImage src={user?.avatar || "https://via.placeholder.com/100"} alt="Avatar" />
-                </Avatar>
-                <div>
-                    <div className="text-2xl font-semibold text-white">{user?.name || "John Doe"}</div>
+            {isLoading ? (
+                <div className="text-2xl font-semibold text-white">Loading...</div>
+            ) : (
+                <div className="flex items-center gap-6">
+                    <Avatar className="w-48 h-48 cursor-pointer border-2 border-gray-300">
+                        <AvatarImage src={user?.avatar || "https://via.placeholder.com/100"} alt="Avatar" />
+                    </Avatar>
+                    <div>
+                        <div className="text-2xl font-semibold text-white">{user?.name || "John Doe"}</div>
 
-                    <div className="mt-4 flex gap-4">
-                        <Button onClick={() => setOpenUpdateDialog(true)} variant="outline" className="transform hover:scale-105 transition-all duration-300 hover:bg-green-50">
-                            Update Profile
-                        </Button>
+                        <div className="mt-4 flex gap-4">
+                            <Button onClick={() => setOpenUpdateDialog(true)} variant="outline" className="transform hover:scale-105 transition-all duration-300 hover:bg-green-50">
+                                Update Profile
+                            </Button>
 
-                        <Button
-                            variant="outline"
-                            className="w-full bg-red-900 border-none flex justify-start items-center gap-2 p-4 text-white transform hover:scale-105 transition-all duration-300"
-                            onClick={() => setOpenDialog(true)}
-                        >
-                            Delete Account
-                        </Button>
+                            <Button
+                                variant="outline"
+                                className="w-full bg-red-900 border-none flex justify-start items-center gap-2 p-4 text-white transform hover:scale-105 transition-all duration-300"
+                                onClick={() => setOpenDialog(true)}
+                            >
+                                Delete Account
+                            </Button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
+
             <Dialog open={openDialog} onOpenChange={setOpenDialog}>
                 <DialogContent>
                     <DialogHeader>
@@ -138,7 +143,7 @@ export function Profile() {
                     </div>
                     <div className="flex justify-between p-4 mt-4">
                         <Button onClick={() => setOpenUpdateDialog(false)} variant="outline">Cancel</Button>
-                        <Button onClick={handleUpdateProfile} color="primary" variant="default">Save Changes</Button>
+                        <Button onClick={handleUpdateProfile} color="primary" variant="default">Update</Button>
                     </div>
                 </DialogContent>
             </Dialog>
