@@ -6,18 +6,20 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 export function Navbar() {
-    const { isAuthenticated } = useAuthClient();
+    const { isAuthenticated, principal } = useAuthClient();
     const principalId = localStorage.getItem("principal");
     const navigate = useNavigate();
-
+    
     useEffect(() => {
         const getUser = async () => {
+            console.log(principal);
 
-            if (!principalId) return;
+            if (!principal) return;
 
-            const user = await icpai_user.getUserInfo(principalId);
+            const user = await icpai_user.getUserInfo(principal);
+            console.log(user);
             
-            if (user.length === 0) {
+            if (user?.[0]?.name === "" || user.length === 0) {
                 navigate('/sign-up');
             }
         }

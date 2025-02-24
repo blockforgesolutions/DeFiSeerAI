@@ -3,28 +3,28 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { icpai_user } from "../../../../declarations/icpai_user";
 import { Principal } from "@dfinity/principal";
 import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
+import { useAuthClient } from "@/context/useAuthClient";
 
 export default function SignUp() {
+    const { actor, principal } = useAuthClient()
     const [name, setName] = useState("");
     const [avatar, setAvatar] = useState("");
-    const principalId = localStorage.getItem("principal");
     const navigate = useNavigate();
     const [isError, setIsError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
 
     const handleSignUp = async () => {
-        if (!principalId) {
+        if (!principal) {
             return
         }
 
-        const avatarValue: [] | [string] = avatar ? [avatar] : [];
-        const principal = Principal.fromText(principalId);
-        const response: boolean = await icpai_user.signUpWithInternetIdentity(name, avatarValue, principal);
+        const avatarValue: string = avatar || "";
+        const userObj = { name, avatar:avatarValue}
+        const response: boolean = await actor.updateUser(userObj, Principal.fromText(principal))
         if (response) {
             navigate("/dashboard");
         } else {
