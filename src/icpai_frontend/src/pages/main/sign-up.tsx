@@ -8,9 +8,10 @@ import { useNavigate } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal } from "lucide-react";
 import { useAuthClient } from "@/context/useAuthClient";
+import { icpai_user } from "../../../../declarations/icpai_user";
 
 export default function SignUp() {
-    const { actor, principal } = useAuthClient()
+    const { principal } = useAuthClient()
     const [name, setName] = useState("");
     const [avatar, setAvatar] = useState("");
     const navigate = useNavigate();
@@ -23,8 +24,8 @@ export default function SignUp() {
         }
 
         const avatarValue: string = avatar || "";
-        const userObj = { name, avatar:avatarValue}
-        const response: boolean = await actor.updateUser(userObj, Principal.fromText(principal))
+        const response: boolean = await icpai_user.signUpWithInternetIdentity(name, [avatarValue], Principal.fromText(principal));
+
         if (response) {
             navigate("/dashboard");
         } else {
@@ -35,7 +36,7 @@ export default function SignUp() {
     }
 
     return (
-        <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
             <Card className="w-full max-w-sm shadow-lg rounded-2xl">
                 <CardHeader>
                     <CardTitle className="text-center text-2xl font-bold">DeFiSeer AI</CardTitle>

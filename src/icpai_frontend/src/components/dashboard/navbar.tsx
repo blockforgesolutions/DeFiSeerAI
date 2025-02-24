@@ -10,21 +10,24 @@ import { Bell, LogOut, User } from "lucide-react";
 import { useAuthClient } from "@/context/useAuthClient";
 
 export function DashboardNavbar() {
-    const { logout, actor, principal } = useAuthClient();
+    const { logout, principal } = useAuthClient();
     const [user, setUser] = useState<UserType | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
 
     const getCurrentUser = async () => {
         if (!principal) return;
-        const response = await actor.getUserInfo(principal);
+        const response = await icpai_user.getUserInfo(principal);
+        
         if (!response || !response[0]) return;
         setUser(response[0]);
     };
 
     useEffect(() => {
-        getCurrentUser();
-    }, []);
+        if (principal) {
+            getCurrentUser();
+        }
+    }, [principal]);
 
     const currentPage = location.pathname.split("/").filter(Boolean).pop();
 

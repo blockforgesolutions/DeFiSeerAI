@@ -1,80 +1,81 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from "react";
 import { AuthClient } from "@dfinity/auth-client";
-import { canisterId, createActor } from "../../../declarations/icpai_user";
+import { Actor, HttpAgent, Identity } from "@dfinity/agent";
+import { idlFactory, canisterId, createActor } from "../../../declarations/icpai_user";
 
 interface AuthContextProps {
   isAuthenticated: boolean;
-  identity: any;
+  identity: Identity | null;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   principal: string | null;
-  actor: any
 }
 
 const AuthContext = createContext<AuthContextProps | null>(null);
 
-export const AuthProvider = ({ children }: { children: ReactNode })=> {
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authClient, setAuthClient] = useState<AuthClient | null>(null);
-  const [identity, setIdentity] = useState<any>(null);
+  const [identity, setIdentity] = useState<Identity | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [principal, setPrincipal] = useState<string | null>(null);
-  const [actor, setActor] = useState<any>(null);
 
-   useEffect(() => {
-    // Initialize AuthClient
-    AuthClient.create().then(async (client) => {
-      updateClient(client);
-    });
+  useEffect(() => {
+    const initAuth = async () => {
+      const client = await AuthClient.create();
+      setAuthClient(client);
+
+      if (await client.isAuthenticated()) {
+        const userIdentity = client.getIdentity();
+        if (userIdentity) {
+          setIdentity(userIdentity);
+          setIsAuthenticated(true);
+          setPrincipal(userIdentity.getPrincipal().toText());
+          localStorage.setItem("principal", userIdentity.getPrincipal().toText());
+        }
+      }
+    };
+
+    initAuth();
   }, []);
-
 
   const login = async () => {
     if (!authClient) return;
     await authClient.login({
       identityProvider: process.env.DFX_NETWORK === "ic"
-      ? "https://identity.ic0.app"
-      : `http://be2us-64aaa-aaaaa-qaabq-cai.localhost:4943/`,
-      onSuccess: async() => {
-        
-        updateClient(authClient);
+        ? "https://identity.ic0.app"
+        : `http://be2us-64aaa-aaaaa-qaabq-cai.localhost:4943/`,
+      onSuccess: async () => {
+        const userIdentity = authClient.getIdentity();        
+        if (userIdentity) {
+          setIdentity(userIdentity);
+          setIsAuthenticated(true);
+          window.location.reload();
+        }
       },
     });
   };
 
   const logout = async () => {
     if (!authClient) return;
-    await authClient?.logout();
-    await updateClient(authClient);
+    await authClient.logout();
+    setIdentity(null);
+    setIsAuthenticated(false);
+    setPrincipal(null);
+    localStorage.removeItem("principal");
   };
 
-  async function updateClient(client: AuthClient) {
-    const isAuthenticated = await client.isAuthenticated();
-    setIsAuthenticated(isAuthenticated);
-
-    const identity = client.getIdentity();
-    setIdentity(identity);
-
-    const principal = identity.getPrincipal().toText();
-    setPrincipal(principal);
-
-    setAuthClient(client);
-
-    const actor = await createActor(canisterId, {
-      agentOptions: {
-        identity,
-        host:'http://127.0.0.1:4943',
-      },
-    });
-
-    setActor(actor);
-    await actor.signUpWithInternetIdentity();
-  }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, identity, login, logout, principal, actor }}>
+    <AuthContext.Provider value={{ isAuthenticated, identity, login, logout, principal }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = (): AuthContextProps => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

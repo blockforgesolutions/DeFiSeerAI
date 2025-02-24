@@ -5,7 +5,7 @@ export const useAuthClient = () => {
   if (!auth) {
     throw new Error("Auth context is null");
   }
-  const { isAuthenticated, identity, login, logout, principal, actor } = auth;
+  const { isAuthenticated, identity, login, logout, principal } = auth;
 
-  return { isAuthenticated, identity, login, logout, principal, actor };
+  return { isAuthenticated, identity, login, logout, principal };
 };

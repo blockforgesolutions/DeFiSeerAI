@@ -3,7 +3,6 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Trie "mo:base/Trie";
 import Option "mo:base/Option";
-import Debug "mo:base/Debug";
 
 actor User {
     public query (message) func greet() : async Principal {
@@ -19,22 +18,23 @@ actor User {
 
     private stable var users : Trie.Trie<Principal, UserType> = Trie.empty();
 
-    public shared query (msg) func whoami() : async Principal {
-        msg.caller;
-    };
-
-    public shared (msg) func signUpWithInternetIdentity() : async Bool {
-        let result = Trie.find(users, userKey(msg.caller), Principal.equal);
+    public shared func signUpWithInternetIdentity(name : Text, avatar : ?Text, principalId : Principal) : async Bool {
+        let result = Trie.find(users, userKey(principalId), Principal.equal);
         let exists = Option.isSome(result);
 
-        // Control whether the user exists
         if (exists) {
-            return false; // User is already registered
+            return false;
         };
 
-        // Create new User
-        let newUser = { name = ""; avatar = "" };
-        users := Trie.replace(users, userKey(msg.caller), Principal.equal, ?newUser).0;
+        let userAvatar = switch (avatar) {
+            case (?a) { a };
+            case null {
+                "https://cryptologos.cc/logos/internet-computer-icp-logo.png";
+            };
+        };
+
+        let newUser = { name = name; avatar = userAvatar };
+        users := Trie.replace(users, userKey(principalId), Principal.equal, ?newUser).0;
 
         return true;
     };

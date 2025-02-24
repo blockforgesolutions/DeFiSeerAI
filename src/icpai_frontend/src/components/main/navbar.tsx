@@ -7,25 +7,21 @@ import { useEffect } from "react";
 
 export function Navbar() {
     const { isAuthenticated, principal } = useAuthClient();
-    const principalId = localStorage.getItem("principal");
     const navigate = useNavigate();
     
     useEffect(() => {
         const getUser = async () => {
-            console.log(principal);
-
             if (!principal) return;
 
             const user = await icpai_user.getUserInfo(principal);
-            console.log(user);
             
-            if (user?.[0]?.name === "" || user.length === 0) {
+            if (user.length === 0) {
                 navigate('/sign-up');
             }
         }
 
         getUser();
-    }, [isAuthenticated, principalId]);
+    }, [isAuthenticated, principal]);
 
     return (
         <div className="w-full flex justify-between items-center p-4">
