@@ -41,9 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async () => {
     if (!authClient) return;
     await authClient.login({
-      identityProvider: process.env.DFX_NETWORK === "ic"
-        ? "https://identity.ic0.app"
-        : `http://be2us-64aaa-aaaaa-qaabq-cai.localhost:4943/`,
+      identityProvider: "https://identity.ic0.app",
       onSuccess: async () => {
         const userIdentity = authClient.getIdentity();        
         if (userIdentity) {

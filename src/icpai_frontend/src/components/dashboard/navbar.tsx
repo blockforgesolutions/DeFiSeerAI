@@ -27,7 +27,7 @@ export function DashboardNavbar() {
         if (principal) {
             getCurrentUser();
         }
-    }, [principal]);
+    }, [principal, user]);
 
     const currentPage = location.pathname.split("/").filter(Boolean).pop();
 
