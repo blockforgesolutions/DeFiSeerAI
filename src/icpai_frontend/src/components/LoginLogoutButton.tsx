@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuthClient } from "../hooks/useAuthClient";
+import { useAuthClient } from "../context/useAuthClient";
 import { Button } from "./ui/button";
 import { LogIn, LogOut } from "lucide-react";
 

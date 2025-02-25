@@ -7,11 +7,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Bell, LogOut, User } from "lucide-react";
-import { useAuthClient } from "@/hooks/useAuthClient";
+import { useAuthClient } from "@/context/useAuthClient";
 
 export function DashboardNavbar() {
-    const { logout } = useAuthClient();
-    const principal = localStorage.getItem("principal");
+    const { logout, principal } = useAuthClient();
     const [user, setUser] = useState<UserType | null>(null);
     const navigate = useNavigate();
     const location = useLocation();
@@ -19,13 +18,16 @@ export function DashboardNavbar() {
     const getCurrentUser = async () => {
         if (!principal) return;
         const response = await icpai_user.getUserInfo(principal);
+        
         if (!response || !response[0]) return;
         setUser(response[0]);
     };
 
     useEffect(() => {
-        getCurrentUser();
-    }, []);
+        if (principal) {
+            getCurrentUser();
+        }
+    }, [principal, user]);
 
     const currentPage = location.pathname.split("/").filter(Boolean).pop();
 
@@ -50,7 +52,6 @@ export function DashboardNavbar() {
                     <PopoverTrigger asChild>
                         <Avatar className="w-10 h-10 cursor-pointer flex justify-center items-center ">
                             <Bell color="white" size={24}/>
-                            <AvatarFallback>U</AvatarFallback>
                         </Avatar>
                     </PopoverTrigger>
                 </Popover>
@@ -58,7 +59,6 @@ export function DashboardNavbar() {
                     <PopoverTrigger asChild>
                         <Avatar className="w-10 h-10 cursor-pointer border-2 border-gray-300">
                             <AvatarImage src={user?.avatar || "https://via.placeholder.com/100"} alt="Avatar" />
-                            <AvatarFallback>U</AvatarFallback>
                         </Avatar>
                     </PopoverTrigger>
                     <PopoverContent align="end" className="w-48 p-2 bg-gray-800 shadow-lg rounded-lg">

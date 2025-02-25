@@ -1,4 +1,4 @@
-import { useAuthClient } from "@/hooks/useAuthClient";
+import { useAuthClient } from "@/context/useAuthClient";
 import LoginLogoutButton from "../LoginLogoutButton";
 import { TypographyH3 } from "../ui/typography-h3";
 import { icpai_user } from '../../../../declarations/icpai_user'
@@ -6,17 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 
 export function Navbar() {
-    const { login, isAuthenticated, logout } = useAuthClient();
-    const principalId = localStorage.getItem("principal");
+    const { isAuthenticated, principal } = useAuthClient();
     const navigate = useNavigate();
-
+    
     useEffect(() => {
         const getUser = async () => {
+            if (!principal) return;
 
-            if (!principalId) return;
-
-            const user = await icpai_user.getUserInfo(principalId);
-            console.log(user);
+            const user = await icpai_user.getUserInfo(principal);
             
             if (user.length === 0) {
                 navigate('/sign-up');
@@ -24,7 +21,7 @@ export function Navbar() {
         }
 
         getUser();
-    }, [isAuthenticated, principalId]);
+    }, [isAuthenticated, principal]);
 
     return (
         <div className="w-full flex justify-between items-center p-4">

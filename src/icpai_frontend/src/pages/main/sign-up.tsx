@@ -3,28 +3,40 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { icpai_user } from "../../../../declarations/icpai_user";
 import { Principal } from "@dfinity/principal";
+import { useNavigate } from "react-router-dom";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Terminal } from "lucide-react";
+import { useAuthClient } from "@/context/useAuthClient";
+import { icpai_user } from "../../../../declarations/icpai_user";
 
 export default function SignUp() {
+    const { principal } = useAuthClient()
     const [name, setName] = useState("");
     const [avatar, setAvatar] = useState("");
-    const principalId = localStorage.getItem("principal");
+    const navigate = useNavigate();
+    const [isError, setIsError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const handleSignUp = async() => {
-        if (!principalId) {
+    const handleSignUp = async () => {
+        if (!principal) {
             return
         }
 
-        const avatarValue: [] | [string] = avatar ? [avatar] : [];
-        const principal = Principal.fromText(principalId);
-        const response = await icpai_user.signUpWithInternetIdentity(name, avatarValue, principal);
-        console.log(response);
-        
+        const avatarValue: string = avatar || "";
+        const response: boolean = await icpai_user.signUpWithInternetIdentity(name, [avatarValue], Principal.fromText(principal));
+
+        if (response) {
+            navigate("/dashboard");
+        } else {
+            setIsError(true);
+            setErrorMessage("Sign up failed! Try again.");
+        }
+
     }
 
     return (
-        <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
             <Card className="w-full max-w-sm shadow-lg rounded-2xl">
                 <CardHeader>
                     <CardTitle className="text-center text-2xl font-bold">DeFiSeer AI</CardTitle>
@@ -48,6 +60,16 @@ export default function SignUp() {
                     <Button onClick={handleSignUp} className="w-full">Sign Up</Button>
                 </CardContent>
             </Card>
+
+            {isError && (
+                <Alert>
+                    <Terminal className="h-4 w-4" />
+                    <AlertTitle>Heads up!</AlertTitle>
+                    <AlertDescription>
+                        {errorMessage}
+                    </AlertDescription>
+                </Alert>
+            )}
         </div>
     );
 }
