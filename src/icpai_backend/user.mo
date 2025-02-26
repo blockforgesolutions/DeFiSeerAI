@@ -3,6 +3,7 @@ import Result "mo:base/Result";
 import Text "mo:base/Text";
 import Trie "mo:base/Trie";
 import Option "mo:base/Option";
+import Debug "mo:base/Debug";
 
 actor User {
     public query (message) func greet() : async Principal {
@@ -18,7 +19,13 @@ actor User {
 
     private stable var users : Trie.Trie<Principal, UserType> = Trie.empty();
 
-    public shared func signUpWithInternetIdentity(name : Text, avatar : ?Text, principalId : Principal) : async Bool {
+    public shared query (msg) func whoami() : async Principal {
+        return msg.caller;
+    };
+
+    public shared (msg) func signUpWithInternetIdentity(name : Text, avatar : ?Text) : async Bool {
+        Debug.print("msg.caller : " # Principal.toText(msg.caller));
+        let principalId = msg.caller;
         let result = Trie.find(users, userKey(principalId), Principal.equal);
         let exists = Option.isSome(result);
 
@@ -37,26 +44,6 @@ actor User {
         users := Trie.replace(users, userKey(principalId), Principal.equal, ?newUser).0;
 
         return true;
-    };
-
-    public func getUserInfo(principalId : Text) : async ?UserType {
-        let principal : ?Principal = do {
-            try {
-                ?Principal.fromText(principalId);
-            } catch _ {
-                null;
-            };
-        };
-
-        switch (principal) {
-            case (?p) {
-                let result = Trie.find(users, userKey(p), Principal.equal);
-                return result;
-            };
-            case null {
-                return null;
-            };
-        };
     };
 
     public shared func updateUser(user : UserType, caller : Principal) : async Bool {
