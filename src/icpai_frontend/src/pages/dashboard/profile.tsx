@@ -21,7 +21,7 @@ export function Profile() {
     const getCurrentUser = async () => {
         if (!principal) return;
         setLoading(true);
-        const response = await icpai_user.getUserInfo(principal);
+        const response = await icpai_user.getCurrentUser(Principal.fromText(principal));
         setLoading(false);
         if (!response || !response[0]) return;
         setUser(response[0]);
@@ -52,7 +52,7 @@ export function Profile() {
             avatar: tempUser.avatar ?? '',
         };
 
-        const response = await icpai_user.updateUser(userData, Principal.fromText(principal));
+        const response = await icpai_user.updateUser(userData,Principal.fromText(principal));
         if (response) {
             setUser(tempUser);
             getCurrentUser();
