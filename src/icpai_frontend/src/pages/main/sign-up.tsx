@@ -11,7 +11,7 @@ import { useAuthClient } from "@/context/useAuthClient";
 import { icpai_user } from "../../../../declarations/icpai_user";
 
 export default function SignUp() {
-    const { principal } = useAuthClient()
+    const { principal, userActor } = useAuthClient()
     const [name, setName] = useState("");
     const [avatar, setAvatar] = useState("");
     const navigate = useNavigate();
@@ -24,8 +24,9 @@ export default function SignUp() {
         }
 
         const avatarValue: string = avatar || "";
-        const response: boolean = await icpai_user.signUpWithInternetIdentity(name, [avatarValue], Principal.fromText(principal));
-
+        const response: boolean = await userActor.signUpWithInternetIdentity(name, [avatarValue]);
+        console.log(response);
+        
         if (response) {
             navigate("/dashboard");
         } else {

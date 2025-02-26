@@ -8,6 +8,7 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbS
 import { useNavigate, useLocation } from "react-router-dom";
 import { Bell, LogOut, User } from "lucide-react";
 import { useAuthClient } from "@/context/useAuthClient";
+import { Principal } from "@dfinity/principal";
 
 export function DashboardNavbar() {
     const { logout, principal } = useAuthClient();
@@ -17,7 +18,8 @@ export function DashboardNavbar() {
 
     const getCurrentUser = async () => {
         if (!principal) return;
-        const response = await icpai_user.getUserInfo(principal);
+        const response = await icpai_user.getCurrentUser(Principal.fromText(principal));
+        console.log(response);
         
         if (!response || !response[0]) return;
         setUser(response[0]);
@@ -27,7 +29,7 @@ export function DashboardNavbar() {
         if (principal) {
             getCurrentUser();
         }
-    }, [principal, user]);
+    }, [principal]);
 
     const currentPage = location.pathname.split("/").filter(Boolean).pop();
 

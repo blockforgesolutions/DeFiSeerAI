@@ -18,7 +18,6 @@ import Types "types";
 
 actor TradingBot {
 
-
     type HttpRequestArgs = {
         url : Text;
         headers : [HttpHeader];
@@ -45,10 +44,10 @@ actor TradingBot {
 
     // Veri yapısı
     type ICPData = {
-        timestamp: Int;
-        price: Float;
-        volume: Float;
-        change24h: Float;
+        timestamp : Int;
+        price : Float;
+        volume : Float;
+        change24h : Float;
     };
 
     private let icpHistory = Buffer.Buffer<ICPData>(1000);
@@ -56,7 +55,7 @@ actor TradingBot {
     private var bias : Float = 0.0;
     private let learningRate : Float = 0.01;
 
-    let ic : Types.IC = actor("aaaaa-aa");
+    let ic : Types.IC = actor ("aaaaa-aa");
 
     // Periyodik işlem için timer ID'si
     private var timerId : Nat = 0;
@@ -67,7 +66,7 @@ actor TradingBot {
         try {
             let host = "min-api.cryptocompare.com";
             let url = "https://" # host # "/data/v2/histoday?fsym=ICP&tsym=USDT&limit=30"; // Son 30 günlük veri
-            
+
             let request_headers = [
                 { name = "Host"; value = host },
                 { name = "User-Agent"; value = "exchange_rate_canister" },
@@ -84,12 +83,12 @@ actor TradingBot {
 
             let response = await ic.http_request(http_request);
             let response_body = Blob.fromArray(response.body);
-            
+
             let decoded_text = switch (Text.decodeUtf8(response_body)) {
                 case (null) { return "Yanıt decode edilemedi" };
-                case (?text) { 
+                case (?text) {
                     Debug.print("Tarihsel Veri API Yanıtı: " # text);
-                    text 
+                    text;
                 };
             };
 
@@ -103,11 +102,12 @@ actor TradingBot {
             };
 
             // Verileri sırala (timestamp'e göre)
-            let sortedData = Array.sort(Buffer.toArray(icpHistory), func(a: ICPData, b: ICPData) : {#less; #equal; #greater} {
-                if (a.timestamp < b.timestamp) #less
-                else if (a.timestamp == b.timestamp) #equal
-                else #greater
-            });
+            let sortedData = Array.sort(
+                Buffer.toArray(icpHistory),
+                func(a : ICPData, b : ICPData) : { #less; #equal; #greater } {
+                    if (a.timestamp < b.timestamp) #less else if (a.timestamp == b.timestamp) #equal else #greater;
+                },
+            );
 
             // Sıralı verileri buffer'a geri yükle
             icpHistory.clear();
@@ -118,9 +118,11 @@ actor TradingBot {
             // Son verileri debug için yazdır
             for (i in Iter.range(0, Int.min(4, icpHistory.size() - 1))) {
                 let data = icpHistory.get(i);
-                Debug.print("Veri " # Int.toText(i) # ": Fiyat=" # Float.toText(data.price) # 
-                           " USDT, Hacim=" # Float.toText(data.volume) # 
-                           ", Zaman=" # Int.toText(data.timestamp));
+                Debug.print(
+                    "Veri " # Int.toText(i) # ": Fiyat=" # Float.toText(data.price) #
+                    " USDT, Hacim=" # Float.toText(data.volume) #
+                    ", Zaman=" # Int.toText(data.timestamp)
+                );
             };
 
             return "Gerçek veri seti yüklendi. Toplam " # Nat.toText(icpHistory.size()) # " veri noktası.";
@@ -148,7 +150,7 @@ actor TradingBot {
         try {
             let host = "min-api.cryptocompare.com";
             let url = "https://" # host # "/data/price?fsym=ICP&tsyms=USDT";
-            
+
             let request_headers = [
                 { name = "Host"; value = host },
                 { name = "User-Agent"; value = "exchange_rate_canister" },
@@ -165,17 +167,17 @@ actor TradingBot {
 
             let response = await ic.http_request(http_request);
             let response_body = Blob.fromArray(response.body);
-            
+
             let decoded_text = switch (Text.decodeUtf8(response_body)) {
                 case (null) { return #err("Yanıt decode edilemedi") };
-                case (?text) { 
+                case (?text) {
                     Debug.print("API Yanıtı: " # text);
-                    text 
+                    text;
                 };
             };
 
             let price = parseCryptoComparePrice(decoded_text);
-            
+
             // Fiyat kontrolü
             if (price <= 0.0) {
                 return #err("Geçersiz fiyat: " # Float.toText(price));
@@ -192,17 +194,17 @@ actor TradingBot {
             #ok("Fiyat başarıyla eklendi: " # Float.toText(price) # " USDT")
 
         } catch (err) {
-            #err("Veri çekilemedi: " # Error.message(err))
-        }
+            #err("Veri çekilemedi: " # Error.message(err));
+        };
     };
 
     // Veri normalizasyonu için yardımcı fonksiyonlar
-    private func normalizeData(data: ICPData) : ICPData {
+    private func normalizeData(data : ICPData) : ICPData {
         // Fiyat kontrolü
         if (Float.isNaN(data.price) or data.price <= 0.0) {
             return {
                 timestamp = data.timestamp;
-                price = data.price;  // Ham fiyatı koru
+                price = data.price; // Ham fiyatı koru
                 volume = data.volume;
                 change24h = data.change24h;
             };
@@ -211,21 +213,21 @@ actor TradingBot {
         // Normalize etme
         return {
             timestamp = data.timestamp;
-            price = data.price;  // Fiyatı normalize etme
+            price = data.price; // Fiyatı normalize etme
             volume = if (data.volume > 0.0) data.volume / 10000000.0 else 0.0;
             change24h = data.change24h / 100.0;
         };
     };
 
     // CryptoCompare JSON parse fonksiyonu
-    private func parseCryptoComparePrice(json: Text) : Float {
+    private func parseCryptoComparePrice(json : Text) : Float {
         Debug.print("Gelen JSON: " # json);
 
         if (Text.contains(json, #text "\"USDT\":")) {
             let parts = Text.split(json, #text "\"USDT\":");
-            switch(parts.next()) {
+            switch (parts.next()) {
                 case (?_) {
-                    switch(parts.next()) {
+                    switch (parts.next()) {
                         case (?valueText) {
                             let cleanText = Text.trim(valueText, #text " {}\"");
                             Debug.print("Parse edilecek değer: " # cleanText);
@@ -235,7 +237,7 @@ actor TradingBot {
                             var decimalPart : Float = 0.0;
                             var isDecimal : Bool = false;
                             var decimalPlace : Float = 0.1;
-                            
+
                             for (c in cleanText.chars()) {
                                 if (c == '.') {
                                     isDecimal := true;
@@ -252,7 +254,7 @@ actor TradingBot {
 
                             let finalPrice = result + decimalPart;
                             Debug.print("Hesaplanan fiyat: " # Float.toText(finalPrice));
-                            
+
                             if (finalPrice > 0.0) {
                                 return finalPrice;
                             };
@@ -263,13 +265,13 @@ actor TradingBot {
                 case null {};
             };
         };
-        
+
         Debug.print("Fiyat parse edilemedi!");
         return 0.0;
     };
 
     // Text'i Float'a çeviren yardımcı fonksiyon
-    private func textToFloat(text: Text) : Float {
+    private func textToFloat(text : Text) : Float {
         var num : Float = 0.0;
         for (c in text.chars()) {
             if (c >= '0' and c <= '9') {
@@ -283,13 +285,13 @@ actor TradingBot {
     public func predict() : async Float {
         if (icpHistory.size() == 0) return 0.0;
         if (weights.size() == 0) return 0.0; // Weights kontrolü ekle
-        
+
         let currentData = icpHistory.get(icpHistory.size() - 1);
-        
+
         var sum = bias;
         // Weight sayısı kontrolü
         let numWeights = Int.min(3, weights.size());
-        
+
         if (numWeights > 0) sum += currentData.price * weights.get(0);
         if (numWeights > 1) sum += currentData.volume * weights.get(1);
         if (numWeights > 2) sum += currentData.change24h * weights.get(2);
@@ -305,7 +307,7 @@ actor TradingBot {
         let prediction = await predict();
         let currentData = icpHistory.get(icpHistory.size() - 1);
         let previousData = icpHistory.get(icpHistory.size() - 2);
-        
+
         let target = if (currentData.price > previousData.price) 1.0 else 0.0;
         let error = target - prediction;
 
@@ -326,21 +328,21 @@ actor TradingBot {
         if (weights.size() == 0) {
             await initializeWeights();
         };
-        
+
         // Veri kontrolü
         if (icpHistory.size() == 0) {
             return "Veri yok. Önce veri yükleyin.";
         };
 
         let currentData = icpHistory.get(icpHistory.size() - 1);
-        
+
         // Fiyat kontrolü
         if (Float.isNaN(currentData.price) or currentData.price <= 0.0) {
             return "Geçersiz fiyat verisi. Lütfen verileri yeniden yükleyin.";
         };
 
         let prediction = await predict();
-        
+
         var signal = "";
         var confidence = 0.0;
 
@@ -356,8 +358,8 @@ actor TradingBot {
         };
 
         return "Güncel Fiyat: " # Float.toText(currentData.price) # " USDT\n" #
-               "Sinyal: " # signal # "\n" #
-               "Güven: %" # Float.toText(confidence);
+        "Sinyal: " # signal # "\n" #
+        "Güven: %" # Float.toText(confidence);
     };
 
     // Model performansını değerlendirme
@@ -370,11 +372,11 @@ actor TradingBot {
         for (i in Iter.range(1, icpHistory.size() - 1)) {
             let prediction = await predict();
             let currentPrice = icpHistory.get(i).price;
-            let previousPrice = icpHistory.get(i-1).price;
-            
+            let previousPrice = icpHistory.get(i - 1).price;
+
             let actualUp = currentPrice > previousPrice;
             let predictedUp = prediction > 0.5;
-            
+
             if (actualUp == predictedUp) {
                 correct += 1.0;
             };
@@ -389,7 +391,7 @@ actor TradingBot {
         try {
             // Veri çek
             let fetchResult = await fetchICPData();
-            switch(fetchResult) {
+            switch (fetchResult) {
                 case (#err(e)) { return "Veri çekme hatası: " # e };
                 case (#ok(_)) {
                     // Modeli eğit
@@ -397,17 +399,17 @@ actor TradingBot {
                         await train();
                         let prediction = await predict();
                         let signal = if (prediction > 0.7) {
-                            "AL"
+                            "AL";
                         } else if (prediction < 0.3) {
-                            "SAT"
+                            "SAT";
                         } else {
-                            "BEKLE"
+                            "BEKLE";
                         };
-                        
+
                         let currentPrice = icpHistory.get(icpHistory.size() - 1).price;
-                        return "Güncel Fiyat: " # Float.toText(currentPrice) # 
-                               " USDT\nSinyal: " # signal # 
-                               "\nGüven: " # Float.toText(Float.abs(prediction - 0.5) * 200) # "%";
+                        return "Güncel Fiyat: " # Float.toText(currentPrice) #
+                        " USDT\nSinyal: " # signal #
+                        "\nGüven: " # Float.toText(Float.abs(prediction - 0.5) * 200) # "%";
                     } else {
                         return "Yeterli veri yok";
                     };
@@ -424,7 +426,7 @@ actor TradingBot {
             let host = "min-api.cryptocompare.com";
             // Saatlik veri için histohour endpointi
             let url = "https://" # host # "/data/v2/histohour?fsym=ICP&tsym=USDT&limit=24";
-            
+
             let request_headers = [
                 { name = "Host"; value = host },
                 { name = "User-Agent"; value = "exchange_rate_canister" },
@@ -441,7 +443,7 @@ actor TradingBot {
 
             let response = await ic.http_request(http_request);
             let response_body = Blob.fromArray(response.body);
-            
+
             let decoded_text = switch (Text.decodeUtf8(response_body)) {
                 case (null) { return "Yanıt decode edilemedi" };
                 case (?text) { text };
@@ -463,26 +465,29 @@ actor TradingBot {
     };
 
     // Tarihsel veri parse fonksiyonu
-    private func parseHistoricalData(json: Text) : [ICPData] {
+    private func parseHistoricalData(json : Text) : [ICPData] {
         var result : Buffer.Buffer<ICPData> = Buffer.Buffer(24);
-        
+
         if (Text.contains(json, #text "\"Data\":[")) {
             let parts = Text.split(json, #text "\"Data\":[");
-            switch(parts.next()) {
-                case (?_) {  // İlk parça
-                    switch(parts.next()) {
+            switch (parts.next()) {
+                case (?_) {
+                    // İlk parça
+                    switch (parts.next()) {
                         case (?dataText) {
                             let items = Text.split(dataText, #text "},{");
-                            
+
                             for (item in items) {
-                                if (Text.contains(item, #text "time") and 
-                                    Text.contains(item, #text "close") and 
-                                    Text.contains(item, #text "volumeto")) {
-                                    
+                                if (
+                                    Text.contains(item, #text "time") and
+                                    Text.contains(item, #text "close") and
+                                    Text.contains(item, #text "volumeto")
+                                ) {
+
                                     let timestamp = parseJsonNumber(item, "time");
                                     let price = parseJsonNumber(item, "close");
                                     let volume = parseJsonNumber(item, "volumeto");
-                                    
+
                                     result.add({
                                         timestamp = Int.abs(Float.toInt(timestamp));
                                         price = price;
@@ -498,18 +503,19 @@ actor TradingBot {
                 case (null) {};
             };
         };
-        
+
         return Buffer.toArray(result);
     };
 
     // JSON sayı parse fonksiyonu
-    private func parseJsonNumber(json: Text, field: Text) : Float {
+    private func parseJsonNumber(json : Text, field : Text) : Float {
         let fieldPattern = "\"" # field # "\":";
         if (Text.contains(json, #text fieldPattern)) {
             let parts = Text.split(json, #text fieldPattern);
-            switch(parts.next()) {
-                case (?_) {  // İlk parça
-                    switch(parts.next()) {
+            switch (parts.next()) {
+                case (?_) {
+                    // İlk parça
+                    switch (parts.next()) {
                         case (?valueText) {
                             let cleanText = Text.trim(valueText, #text " ,{}\"[]");
                             // Manuel string to float dönüşümü
@@ -518,7 +524,7 @@ actor TradingBot {
                             var isDecimal : Bool = false;
                             var decimalPlace : Float = 0.1;
                             var isNegative : Bool = false;
-                            
+
                             for (c in cleanText.chars()) {
                                 if (c == '-') {
                                     isNegative := true;
@@ -549,22 +555,22 @@ actor TradingBot {
     // Otomatik trading başlat (güncellendi)
     public func startAutoTrading() : async Text {
         if (isRunning) return "Bot zaten çalışıyor!";
-        
+
         // İlk önce 24 saatlik veriyi çek
         let initResult = await fetch24HourData();
         if (Text.contains(initResult, #text "Hata")) {
             return "Bot başlatılamadı: " # initResult;
         };
-        
+
         isRunning := true;
-        
+
         // Her 30 saniyede bir çalışacak şekilde ayarla
         timerId := Timer.setTimer(
             #seconds(30),
             func() : async () {
                 let result = await fetchAndTrain();
                 Debug.print("\n=== Auto Trading Sonuç ===\n" # result # "\n=====================\n");
-            }
+            },
         );
 
         return "Bot başlatıldı. 24 saatlik veri yüklendi ve her 30 saniyede bir güncellenecek.";
@@ -573,7 +579,7 @@ actor TradingBot {
     // Periyodik trading durdur
     public func stopAutoTrading() : async Text {
         if (not isRunning) return "Bot zaten durdurulmuş!";
-        
+
         Timer.cancelTimer(timerId);
         isRunning := false;
         return "Bot durduruldu.";
@@ -585,8 +591,8 @@ actor TradingBot {
             let lastData = icpHistory.get(icpHistory.size() - 1);
             let timestamp = Int.abs(lastData.timestamp); // Int'i Nat'a çevir
             return "Bot çalışıyor\n" #
-                   "Son güncelleme: " # Nat.toText(timestamp) # "\n" #
-                   "Son fiyat: " # Float.toText(lastData.price) # " USDT";
+            "Son güncelleme: " # Nat.toText(timestamp) # "\n" #
+            "Son fiyat: " # Float.toText(lastData.price) # " USDT";
         } else {
             return "Bot şu anda çalışmıyor.";
         };
@@ -595,17 +601,19 @@ actor TradingBot {
     // Son N işlemi getir
     public func getLastTrades(n : Nat) : async Text {
         if (icpHistory.size() == 0) return "Henüz işlem yok";
-        
-        let start = Nat.max(0, Nat.sub(icpHistory.size(), n));
+
+        let size = icpHistory.size();
+        let start = if (n > size) { 0 } else { Nat.sub(size, n) }; // Güvenli başlangıç noktası hesapla
         var result = "Son " # Nat.toText(n) # " işlem:\n";
-        
-        for (i in Iter.range(start, icpHistory.size() - 1)) {
+
+        for (i in Iter.range(start, size - 1)) {
             let data = icpHistory.get(i);
             let timestamp = Int.abs(data.timestamp); // Int'i Nat'a çevir
-            result #= "Zaman: " # Nat.toText(timestamp) # 
-                      " Fiyat: " # Float.toText(data.price) # " USDT\n";
+            result #= "Zaman: " # Nat.toText(timestamp) #
+            " Fiyat: " # Float.toText(data.price) # " USDT\n";
         };
-        
+
         return result;
     };
-}
+
+};

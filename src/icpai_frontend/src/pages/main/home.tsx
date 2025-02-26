@@ -5,6 +5,8 @@ import { TypographyH3 } from "@/components/ui/typography-h3";
 import { TypographyP } from "@/components/ui/typography-p";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useAuthClient } from "@/context/useAuthClient";
+import { useNavigate } from "react-router-dom";
 
 const tools = [
     {
@@ -49,6 +51,9 @@ const faqs = [
 ];
 
 export default function Home() {
+    const { isAuthenticated } = useAuthClient()
+    const navigate = useNavigate();
+
     return (
         <div className="w-full text-white min-h-screen flex flex-col justify-center items-center p-10">
             <div className="w-full flex flex-col justify-center items-center">
@@ -58,7 +63,7 @@ export default function Home() {
                     <Rocket color="orange" size={40} />
                 </div>
                 <TypographyP className="mt-4 text-lg text-gray-400 text-center max-w-3xl" paragraph="AI-powered cryptocurrency price prediction and automated trading bot integration. Get ahead in the market with our intelligent analytics and automation tools." />
-                <Button className="mt-6 bg-orange-500 hover:bg-orange-600 px-6 py-3 text-lg rounded-lg">
+                <Button onClick={() => isAuthenticated ? navigate('/dashboard') : null} className="mt-6 bg-orange-500 hover:bg-orange-600 px-6 py-3 text-lg rounded-lg">
                     Start Automating Your Trades
                 </Button>
                 <TypographyP className="mt-2 text-sm text-gray-500" paragraph="Loved by thousands of crypto traders worldwide!" />

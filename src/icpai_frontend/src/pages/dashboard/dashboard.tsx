@@ -31,7 +31,7 @@ const Dashboard = () => {
 
     const fetchLastTrades = async () => {
         setLoading(true);
-        const result = await icpai_backend.getLastTrades(10n);
+        const result = await icpai_backend.getLastTrades(BigInt(10));
         setTrades(parseTrades(result));
         setLoading(false);
     };
