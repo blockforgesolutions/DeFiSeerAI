@@ -36,7 +36,7 @@ actor User {
         let userAvatar = switch (avatar) {
             case (?a) { a };
             case null {
-                "https://cryptologos.cc/logos/internet-computer-icp-logo.png";
+                "https://cdn3.pixelcut.app/7/20/uncrop_hero_bdf08a8ca6.jpg";
             };
         };
 
