@@ -17,8 +17,7 @@ export function DashboardNavbar() {
     const location = useLocation();
 
     const getCurrentUser = async () => {
-        if (!principal) return;
-        const response = await icpai_user.getCurrentUser(Principal.fromText(principal));
+        const response = await icpai_user.getCurrentUser(Principal.fromText(principal ?? ''));
         console.log(response);
         
         if (!response || !response[0]) return;
